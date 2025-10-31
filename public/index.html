@@ -313,12 +313,12 @@
                         <div class="calculator">
                         <div class="calc-title">Waste Value Calculator</div>
                         <div class="price-list">
-                            <div><span>PET Plastic (per kg)</span> <span>R4.00</span></div>
-                            <div><span>HDPE Plastic (per kg)</span> <span>R3.50</span></div>
-                            <div><span>Aluminum Cans (per kg)</span> <span>R12.00</span></div>
+                            <div><span>PET Plastic (per kg)</span> <span>R2.50</span></div>
+                            <div><span>HDPE Plastic (per kg)</span> <span>R3.00</span></div>
+                            <div><span>Aluminum Cans (per kg)</span> <span>R8.00</span></div>
                             <div><span>Glass (per kg)</span> <span>R0.50</span></div>
-                            <div><span>Paper/Cardboard (per kg)</span> <span>R2.00</span></div>
-                            <div><span>Mixed Recyclables (per kg)</span> <span>R1.50</span></div>
+                            <div><span>Paper/Cardboard (per kg)</span> <span>R1.00</span></div>
+                            <div><span>Mixed Recyclables (per kg)</span> <span>R1.00</span></div>
                         </div>                        <div class="camera-feed">
                             <video id="video" playsinline autoplay></video>
                             <canvas id="canvas"></canvas>
@@ -625,14 +625,14 @@
       const estWeight = document.getElementById('estWeight');
       const estValue = document.getElementById('estValue');
 
-      // Waste type prices (R/kg) - Updated South African rates
+      // Waste type prices (R/kg)
       const prices = {
-        'PET': 4.00,    // Clear PET bottles
-        'HDPE': 3.50,   // Milk bottles, containers
-        'aluminum': 12.00, // Cans and foil
+        'PET': 2.50,    // Clear PET bottles
+        'HDPE': 3.00,   // Milk bottles, containers
+        'aluminum': 8.00, // Cans and foil
         'glass': 0.50,
-        'paper': 2.00,  // Cardboard and paper
-        'mixed': 1.50   // Mixed recyclables
+        'paper': 1.00,  // Cardboard and paper
+        'mixed': 1.00   // Mixed recyclables
       };
 
       let stream = null;

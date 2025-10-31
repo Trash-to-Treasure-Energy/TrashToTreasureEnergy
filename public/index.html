@@ -173,6 +173,28 @@
                 border-radius:8px;
                 background:rgba(255,255,255,0.05);
                 display:none;
+                animation: fadeIn 0.5s ease-out;
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(-10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            
+            .scan-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: linear-gradient(transparent, rgba(106,0,255,0.2));
+                animation: scanMove 1s ease-out;
+                pointer-events: none;
+            }
+            
+            @keyframes scanMove {
+                from { transform: translateY(-100%); }
+                to { transform: translateY(100%); }
             }
             .contact-info{
                 display:flex;
@@ -288,17 +310,16 @@
             </a>
           </div>
 
-                    <div class="calculator">
+                        <div class="calculator">
                         <div class="calc-title">Waste Value Calculator</div>
                         <div class="price-list">
-                            <div><span>PET Plastic (per kg)</span> <span>R2.50</span></div>
-                            <div><span>HDPE Plastic (per kg)</span> <span>R3.00</span></div>
-                            <div><span>Aluminum Cans (per kg)</span> <span>R8.00</span></div>
+                            <div><span>PET Plastic (per kg)</span> <span>R4.00</span></div>
+                            <div><span>HDPE Plastic (per kg)</span> <span>R3.50</span></div>
+                            <div><span>Aluminum Cans (per kg)</span> <span>R12.00</span></div>
                             <div><span>Glass (per kg)</span> <span>R0.50</span></div>
-                            <div><span>Paper/Cardboard (per kg)</span> <span>R1.00</span></div>
-                        </div>
-                        
-                        <div class="camera-feed">
+                            <div><span>Paper/Cardboard (per kg)</span> <span>R2.00</span></div>
+                            <div><span>Mixed Recyclables (per kg)</span> <span>R1.50</span></div>
+                        </div>                        <div class="camera-feed">
                             <video id="video" playsinline autoplay></video>
                             <canvas id="canvas"></canvas>
                         </div>
@@ -309,9 +330,10 @@
                         </div>
 
                         <div class="result-card" id="result">
-                            <div class="calc-title">Estimated Value</div>
-                            <div>Weight: <span id="estWeight">0</span> kg</div>
-                            <div>Value: R<span id="estValue">0.00</span></div>
+                            <div class="calc-title">Scan Results</div>
+                            <div style="margin-bottom:8px">Detected: <span id="wasteType" style="color:var(--accent2);font-weight:600">-</span></div>
+                            <div>Weight: <span id="estWeight" style="color:var(--accent2);font-weight:600">0</span> kg</div>
+                            <div style="font-size:18px;margin-top:8px">Value: R<span id="estValue" style="color:var(--accent2);font-weight:600">0.00</span></div>
                         </div>
                     </div>
 
@@ -603,13 +625,14 @@
       const estWeight = document.getElementById('estWeight');
       const estValue = document.getElementById('estValue');
 
-      // Waste type prices (R/kg)
+      // Waste type prices (R/kg) - Updated South African rates
       const prices = {
-        'PET': 2.50,
-        'HDPE': 3.00,
-        'aluminum': 8.00,
+        'PET': 4.00,    // Clear PET bottles
+        'HDPE': 3.50,   // Milk bottles, containers
+        'aluminum': 12.00, // Cans and foil
         'glass': 0.50,
-        'paper': 1.00
+        'paper': 2.00,  // Cardboard and paper
+        'mixed': 1.50   // Mixed recyclables
       };
 
       let stream = null;
@@ -658,55 +681,153 @@
         const type = detectWasteType(imageData);
         const value = calculateValue(weight, type);
 
-        // Show results
+        // Show results with animation
         result.style.display = 'block';
+        result.style.animation = 'none';
+        result.offsetHeight; // Trigger reflow
+        result.style.animation = 'fadeIn 0.5s ease-out';
+        
+        // Update results with detected type
+        document.getElementById('wasteType').textContent = type.toUpperCase();
         estWeight.textContent = weight.toFixed(2);
         estValue.textContent = value.toFixed(2);
+        
+        // Show scanning overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'scan-overlay';
+        document.querySelector('.camera-feed').appendChild(overlay);
+        setTimeout(() => overlay.remove(), 1000);
       });
 
       function estimateWeight(imageData) {
-        // Simplified estimation - in reality would use ML model
-        // This demo uses basic image analysis
-        let totalPixels = 0;
         const data = imageData.data;
+        const width = imageData.width;
+        const height = imageData.height;
+        let totalPixels = 0;
+        let avgBrightness = 0;
+        let edges = 0;
         
-        // Count non-background pixels
-        for (let i = 0; i < data.length; i += 4) {
-          const r = data[i];
-          const g = data[i + 1];
-          const b = data[i + 2];
-          if (r > 30 || g > 30 || b > 30) { // Non-black pixels
-            totalPixels++;
+        // Calculate average brightness and detect edges
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const i = (y * width + x) * 4;
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            
+            // Brightness calculation
+            const brightness = (r + g + b) / 3;
+            avgBrightness += brightness;
+            
+            // Simple edge detection
+            if (x < width - 1 && y < height - 1) {
+              const nextR = data[i + 4];
+              const nextG = data[i + 5];
+              const nextB = data[i + 6];
+              const downR = data[i + width * 4];
+              const downG = data[i + width * 4 + 1];
+              const downB = data[i + width * 4 + 2];
+              
+              const horizDiff = Math.abs(r - nextR) + Math.abs(g - nextG) + Math.abs(b - nextB);
+              const vertDiff = Math.abs(r - downR) + Math.abs(g - downG) + Math.abs(b - downB);
+              
+              if (horizDiff > 100 || vertDiff > 100) edges++;
+            }
+            
+            // Count non-background pixels
+            if (brightness > 30) totalPixels++;
           }
         }
-
-        // Convert pixel count to rough weight estimate
-        // This is a very simple approximation
-        const coverage = totalPixels / (imageData.width * imageData.height);
-        return coverage * 5; // Rough estimate, max 5kg
+        
+        avgBrightness /= (width * height);
+        const coverage = totalPixels / (width * height);
+        const edgeRatio = edges / (width * height);
+        
+        // Weight estimation factors:
+        // 1. Coverage (how much of frame is filled)
+        // 2. Edge density (more edges = more complex/filled bag)
+        // 3. Average brightness (darker usually means more content)
+        const weightEstimate = (
+          coverage * 3 +          // Base weight from coverage
+          edgeRatio * 5 +        // Additional weight from complexity
+          (1 - avgBrightness/255) * 2  // Darkness factor
+        );
+        
+        // Clamp between 0.1 and 15kg
+        return Math.min(Math.max(weightEstimate, 0.1), 15);
       }
 
       function detectWasteType(imageData) {
-        // Simplified type detection - would use ML in production
-        // Returns the most likely waste type based on color analysis
         const data = imageData.data;
+        const width = imageData.width;
+        const height = imageData.height;
         let colors = { r: 0, g: 0, b: 0 };
+        let transparency = 0;
+        let metallicness = 0;
+        let texture = 0;
         
-        for (let i = 0; i < data.length; i += 4) {
-          colors.r += data[i];
-          colors.g += data[i + 1];
-          colors.b += data[i + 2];
+        // Analyze image properties
+        for (let y = 0; y < height; y++) {
+          for (let x = 0; x < width; x++) {
+            const i = (y * width + x) * 4;
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+            
+            colors.r += r;
+            colors.g += g;
+            colors.b += b;
+            
+            // Detect transparency (clear plastics)
+            const brightness = (r + g + b) / 3;
+            if (brightness > 200 && Math.abs(r - g) < 10 && Math.abs(g - b) < 10) {
+              transparency++;
+            }
+            
+            // Detect metallic surfaces
+            if (Math.abs(r - g) < 10 && Math.abs(g - b) < 10 && brightness > 150) {
+              metallicness++;
+            }
+            
+            // Analyze texture (for paper/cardboard)
+            if (x < width - 1 && y < height - 1) {
+              const nextBrightness = (data[i + 4] + data[i + 5] + data[i + 6]) / 3;
+              if (Math.abs(brightness - nextBrightness) > 20) {
+                texture++;
+              }
+            }
+          }
         }
-
-        // Simple color-based classification
-        const total = colors.r + colors.g + colors.b;
-        if (total > 0) {
-          if (colors.b > colors.r && colors.b > colors.g) return 'PET';
-          if (colors.g > colors.r && colors.g > colors.b) return 'HDPE';
-          if (colors.r > colors.g && colors.r > colors.b) return 'aluminum';
+        
+        const pixelCount = width * height;
+        colors.r /= pixelCount;
+        colors.g /= pixelCount;
+        colors.b /= pixelCount;
+        transparency = transparency / pixelCount;
+        metallicness = metallicness / pixelCount;
+        texture = texture / pixelCount;
+        
+        // Improved waste type classification
+        if (transparency > 0.3) return 'PET';  // Clear plastic bottles
+        if (metallicness > 0.25) return 'aluminum';  // Metallic surfaces
+        if (texture > 0.15) return 'paper';  // Textured surfaces like paper/cardboard
+        
+        // Color-based classification as fallback
+        const colorDiff = Math.max(
+          Math.abs(colors.r - colors.g),
+          Math.abs(colors.g - colors.b),
+          Math.abs(colors.b - colors.r)
+        );
+        
+        if (colorDiff < 15) {  // Similar RGB values
+          if ((colors.r + colors.g + colors.b) / 3 > 150) return 'aluminum';
           return 'paper';
         }
-        return 'paper';
+        
+        // Colored plastics
+        if (colors.b > Math.max(colors.r, colors.g)) return 'PET';
+        if (colors.g > Math.max(colors.r, colors.b)) return 'HDPE';
+        return 'mixed';
       }
 
       function calculateValue(weight, type) {

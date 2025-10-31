@@ -1,0 +1,6 @@
+# This tells Render how to build and start the app
+build:
+  - npm install
+
+# Start the app
+start: node server.js

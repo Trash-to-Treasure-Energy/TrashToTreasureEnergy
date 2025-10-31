@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Trash To Treasure Chat</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#2b0b3a">
+  <link rel="apple-touch-icon" href="/icon-192.svg">
+        <style>
+            :root{
+                --bg1:#2b0b3a;
+                --bg2:#6a00ff;
+                --accent1:#ff6b00;
+                --accent2:#ff9d4d;
+                --card:#1b0a2a;
+                --accent:#b388ff;
+                --muted:#cfc6de;
+            }
+            html,body{height:100%;}
+            body{
+                margin:0;
+                font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+                background: radial-gradient(1200px 600px at 10% 10%, rgba(106,0,255,0.18), transparent),
+                           radial-gradient(800px 800px at 90% 90%, rgba(255,107,0,0.12), transparent),
+                           linear-gradient(180deg,var(--bg1),#16021b);
+                color:var(--muted);
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                padding:40px 20px;
+            }
+            .container{
+                width:100%;
+                max-width:900px;
+                background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+                border-radius:16px;
+                box-shadow: 0 10px 40px rgba(20,4,40,0.6);
+                padding:20px;
+                border: 1px solid rgba(255,255,255,0.03);
+                backdrop-filter: blur(6px);
+            }
+            header{
+                display:flex;
+                align-items:center;
+                gap:14px;
+            }
+            .logo{
+                width:64px;height:64px;display:flex;align-items:center;justify-content:center;border-radius:12px;
+                background:linear-gradient(135deg,var(--bg2),#9a5cff);
+                box-shadow: 0 6px 18px rgba(106,0,255,0.18);
+            }
+            h1{margin:0;font-size:20px;color:white;letter-spacing:0.4px;text-shadow:0 2px 12px rgba(106,0,255,0.2)}
+            .subtitle{font-size:13px;color:var(--accent);margin-top:2px}
+            .icons{margin-left:auto;display:flex;gap:12px;align-items:center}
+            .icon-btn{
+                display:flex;
+                flex-direction:column;
+                align-items:center;
+                font-size:11px;
+                color:var(--muted);
+                gap:4px;
+                padding:8px;
+                border-radius:12px;
+                cursor:pointer;
+                transition:all 0.2s ease;
+                position:relative;
+                user-select:none;
+            }
+            .icon-btn:hover{
+                background:rgba(255,255,255,0.03);
+                transform:translateY(-1px);
+            }
+            .icon-btn:active{
+                transform:translateY(0px);
+            }
+            .icon-btn svg{
+                filter:drop-shadow(0 4px 8px rgba(106,0,255,0.12));
+                transition:all 0.2s ease;
+            }
+            .icon-btn:hover svg{
+                filter:drop-shadow(0 6px 12px rgba(255,107,0,0.2));
+            }
+            .icon-btn.active{
+                background:linear-gradient(135deg, rgba(255,107,0,0.1), rgba(255,157,77,0.05));
+                border:1px solid rgba(255,107,0,0.1);
+            }
+            .icon-btn.active svg path{
+                stroke:var(--accent2);
+            }
+
+            main{display:flex;gap:20px;margin-top:18px}
+            .left{flex:1;min-width:280px}
+            .chat-card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+            #chat{height:260px;overflow:auto;padding:10px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.02));}
+            .msg{padding:8px 10px;border-radius:8px;margin-bottom:8px;font-size:14px}
+            .you{background:linear-gradient(90deg,#2a0f55, #3b1b6a);color:#dcd6ff;text-align:right}
+            .ai{background:linear-gradient(90deg,#0f1620,#15202b);color:#e6e6ff;text-align:left}
+
+            .composer{display:flex;gap:8px;margin-top:10px}
+            .composer input{flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--muted)}
+            .composer button{padding:10px 16px;border-radius:10px;border:none;background:var(--bg2);color:white;cursor:pointer;box-shadow:0 6px 20px rgba(106,0,255,0.14)}
+
+            .right{width:260px}
+            .card{padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));border:1px solid rgba(255,255,255,0.03)}
+            .small{font-size:13px;color:var(--muted)}
+            
+            .calculator{
+                margin-top:12px;
+                padding:16px;
+                background:linear-gradient(135deg, rgba(255,107,0,0.1), rgba(255,157,77,0.05));
+                border-radius:12px;
+                border:1px solid rgba(255,107,0,0.1);
+            }
+            .calc-title{
+                font-size:14px;
+                font-weight:600;
+                color:white;
+                margin-bottom:12px;
+            }
+            .price-list{
+                font-size:13px;
+                color:var(--muted);
+                margin:8px 0;
+            }
+            .price-list div{
+                display:flex;
+                justify-content:space-between;
+                margin:4px 0;
+            }
+            .camera-feed{
+                width:100%;
+                height:200px;
+                border-radius:8px;
+                background:#000;
+                margin:8px 0;
+                position:relative;
+                overflow:hidden;
+            }
+            .camera-feed video{
+                width:100%;
+                height:100%;
+                object-fit:cover;
+            }
+            .camera-feed canvas{
+                position:absolute;
+                top:0;
+                left:0;
+                width:100%;
+                height:100%;
+            }
+            .camera-controls{
+                display:flex;
+                gap:8px;
+                margin-top:8px;
+            }
+            .camera-btn{
+                flex:1;
+                padding:8px;
+                border-radius:8px;
+                border:none;
+                background:var(--accent1);
+                color:white;
+                font-size:13px;
+                cursor:pointer;
+            }
+            .result-card{
+                margin-top:12px;
+                padding:12px;
+                border-radius:8px;
+                background:rgba(255,255,255,0.05);
+                display:none;
+            }
+            .contact-info{
+                display:flex;
+                align-items:center;
+                gap:8px;
+                padding:8px;
+                border-radius:8px;
+                background:rgba(255,255,255,0.03);
+                margin-top:8px;
+                transition:all 0.2s;
+            }
+            .contact-info:hover{
+                background:rgba(255,255,255,0.05);
+            }
+            .contact-info svg{
+                width:20px;
+                height:20px;
+                opacity:0.7;
+            }
+            .contact-label{
+                font-size:12px;
+                opacity:0.7;
+            }
+            footer{display:flex;justify-content:space-between;margin-top:14px;font-size:12px;color:rgba(255,255,255,0.5)}
+            @media (max-width:720px){main{flex-direction:column}.right{width:100%}}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                <div class="logo" aria-hidden>
+                    <!-- Trash icon -->
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3 6h18M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6M10 6V4a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v2" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1>Trash To Treasure Chat</h1>
+                    <div class="subtitle">Turn ideas (or items) into value — ask about reuse, consumer law, or finance</div>
+                </div>
+
+                <div class="icons">
+                    <div class="icon-btn" title="Trash / Reuse" data-context="reuse" onclick="setContext('reuse')">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6v12a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2V6M10 6V4a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v2" stroke="#bfb1ff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <div>Reuse</div>
+                    </div>
+
+                    <div class="icon-btn" title="Consumer Law" data-context="law" onclick="setContext('law')">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 2v6M7 8h10M6 20h12M9 12l-3 6h12l-3-6" stroke="#bfb1ff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <div>Consumer Law</div>
+                    </div>
+
+                    <div class="icon-btn" title="Financial Literacy" data-context="finance" onclick="setContext('finance')">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 1v22M17 5H9a3 3 0 0 0 0 6h6a3 3 0 0 1 0 6H7" stroke="#bfb1ff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <div>Finance</div>
+                    </div>
+                </div>
+            </header>
+
+            <main>
+                <div class="left">
+                    <div class="chat-card card">
+                        <div id="chat"></div>
+
+                        <div class="composer">
+                            <input id="msg" type="text" placeholder="Ask how to turn trash into treasure..." />
+                            <button id="send">Send</button>
+                        </div>
+                    </div>
+                </div>
+
+                <aside class="right">
+                    <div class="card">
+                        <div class="small"><strong>Contact & Support</strong></div>
+                        <a href="tel:+27721574855" class="contact-info">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke-width="1.2"/></svg>
+                            <div>
+                                <div class="contact-label">Call or WhatsApp</div>
+                                <div>+27 72 157 4855</div>
+                            </div>
+                        </a>
+                        <a href="https://wa.me/27721574855" class="contact-info" target="_blank">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" stroke-width="1.2"/></svg>
+                            <div>
+                                <div class="contact-label">Chat on WhatsApp</div>
+                                <div>Open WhatsApp</div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="calculator">
+                        <div class="calc-title">Waste Value Calculator</div>
+                        <div class="price-list">
+                            <div><span>PET Plastic (per kg)</span> <span>R2.50</span></div>
+                            <div><span>HDPE Plastic (per kg)</span> <span>R3.00</span></div>
+                            <div><span>Aluminum Cans (per kg)</span> <span>R8.00</span></div>
+                            <div><span>Glass (per kg)</span> <span>R0.50</span></div>
+                            <div><span>Paper/Cardboard (per kg)</span> <span>R1.00</span></div>
+                        </div>
+                        
+                        <div class="camera-feed">
+                            <video id="video" playsinline autoplay></video>
+                            <canvas id="canvas"></canvas>
+                        </div>
+                        
+                        <div class="camera-controls">
+                            <button class="camera-btn" id="startCamera">Start Camera</button>
+                            <button class="camera-btn" id="captureImage">Capture</button>
+                        </div>
+
+                        <div class="result-card" id="result">
+                            <div class="calc-title">Estimated Value</div>
+                            <div>Weight: <span id="estWeight">0</span> kg</div>
+                            <div>Value: R<span id="estValue">0.00</span></div>
+                        </div>
+                    </div>
+
+                    <div style="height:12px"></div>
+                    <div class="card small">
+                        Model status: <span id="status">Checking...</span>
+                    </div>
+                </aside>
+            </main>
+
+            <footer>
+                <div>Built for local use • data stays on your machine</div>
+                <div>v1.0</div>
+            </footer>
+        </div>
+
+        <script>
+      const chat = document.getElementById('chat');
+      const input = document.getElementById('msg');
+      const btn = document.getElementById('send');
+      const status = document.getElementById('status');
+
+      // Auth modal elements (created below)
+      let authModal;
+      let authUsername;
+      let authPassword;
+      let authSignupBtn;
+      let authLoginBtn;
+
+      btn.addEventListener('click', send);
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') send(); });
+
+      function addBubble(text, cls){
+        const d = document.createElement('div');
+        d.className = 'msg '+cls;
+        d.textContent = text;
+        chat.appendChild(d);
+        chat.scrollTop = chat.scrollHeight;
+      }
+
+      async function checkHealth(){
+        try{
+          const r = await fetch('/health');
+          const j = await r.json();
+          status.textContent = j.modelReady ? 'Model loaded' : 'Waiting for model';
+        }catch(e){status.textContent='Offline'}
+      }
+
+      async function checkAuth(){
+        try{
+          const r = await fetch('/me');
+          const j = await r.json();
+          if (j.user) {
+            hideAuth();
+          } else {
+            showAuth();
+          }
+        }catch(e){
+          showAuth();
+        }
+      }
+
+      checkHealth();
+      checkAuth();
+
+      function createAuthModal(){
+        // simple modal
+        authModal = document.createElement('div');
+        authModal.style.position = 'fixed';
+        authModal.style.left = 0;
+        authModal.style.top = 0;
+        authModal.style.right = 0;
+        authModal.style.bottom = 0;
+        authModal.style.background = 'rgba(0,0,0,0.6)';
+        authModal.style.display = 'flex';
+        authModal.style.alignItems = 'center';
+        authModal.style.justifyContent = 'center';
+        authModal.style.zIndex = 1200;
+        authModal.style.backdropFilter = 'blur(4px)';
+
+        const box = document.createElement('div');
+        box.style.background = 'linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.02))';
+        box.style.padding = '24px';
+        box.style.borderRadius = '16px';
+        box.style.width = '360px';
+        box.style.boxShadow = '0 10px 30px rgba(0,0,0,0.6)';
+        box.style.border = '1px solid rgba(255,255,255,0.04)';
+
+        const title = document.createElement('div');
+        title.textContent = 'Sign up or Log in to continue';
+        title.style.fontWeight = '600';
+        title.style.marginBottom = '16px';
+        title.style.color = 'white';
+        title.style.fontSize = '18px';
+
+        authUsername = document.createElement('input');
+        authUsername.placeholder = 'Username';
+        authUsername.style.width = '100%';
+        authUsername.style.padding = '12px';
+        authUsername.style.marginBottom = '10px';
+        authUsername.style.borderRadius = '10px';
+        authUsername.style.border = '1px solid rgba(255,255,255,0.06)';
+        authUsername.style.background = 'rgba(255,255,255,0.02)';
+        authUsername.style.color = 'var(--muted)';
+        authUsername.style.fontSize = '14px';
+
+        const authEmail = document.createElement('input');
+        authEmail.type = 'email';
+        authEmail.placeholder = 'Email (optional)';
+        authEmail.style.width = '100%';
+        authEmail.style.padding = '12px';
+        authEmail.style.marginBottom = '10px';
+        authEmail.style.borderRadius = '10px';
+        authEmail.style.border = '1px solid rgba(255,255,255,0.06)';
+        authEmail.style.background = 'rgba(255,255,255,0.02)';
+        authEmail.style.color = 'var(--muted)';
+        authEmail.style.fontSize = '14px';
+
+        authPassword = document.createElement('input');
+        authPassword.type = 'password';
+        authPassword.placeholder = 'Password';
+        authPassword.style.width = '100%';
+        authPassword.style.padding = '12px';
+        authPassword.style.marginBottom = '16px';
+        authPassword.style.borderRadius = '10px';
+        authPassword.style.border = '1px solid rgba(255,255,255,0.06)';
+        authPassword.style.background = 'rgba(255,255,255,0.02)';
+        authPassword.style.color = 'var(--muted)';
+        authPassword.style.fontSize = '14px';
+
+        const row = document.createElement('div');
+        row.style.display = 'flex';
+        row.style.gap = '10px';
+
+        authSignupBtn = document.createElement('button');
+        authSignupBtn.textContent = 'Sign up';
+        authSignupBtn.style.flex = '1';
+        authSignupBtn.style.padding = '12px';
+        authSignupBtn.style.borderRadius = '10px';
+        authSignupBtn.style.border = 'none';
+        authSignupBtn.style.background = 'linear-gradient(135deg, var(--accent1), var(--accent2))';
+        authSignupBtn.style.color = 'white';
+        authSignupBtn.style.fontSize = '14px';
+        authSignupBtn.style.fontWeight = '500';
+        authSignupBtn.style.cursor = 'pointer';
+        authSignupBtn.style.transition = 'transform 0.15s';
+        authSignupBtn.addEventListener('mouseover', () => { authSignupBtn.style.transform = 'translateY(-1px)'; });
+        authSignupBtn.addEventListener('mouseout', () => { authSignupBtn.style.transform = 'none'; });
+
+        authLoginBtn = document.createElement('button');
+        authLoginBtn.textContent = 'Log in';
+        authLoginBtn.style.flex = '1';
+        authLoginBtn.style.padding = '12px';
+        authLoginBtn.style.borderRadius = '10px';
+        authLoginBtn.style.border = '1px solid rgba(255,255,255,0.08)';
+        authLoginBtn.style.background = 'transparent';
+        authLoginBtn.style.color = 'var(--muted)';
+        authLoginBtn.style.fontSize = '14px';
+        authLoginBtn.style.cursor = 'pointer';
+        authLoginBtn.style.transition = 'all 0.15s';
+        authLoginBtn.addEventListener('mouseover', () => { 
+            authLoginBtn.style.background = 'rgba(255,255,255,0.03)';
+            authLoginBtn.style.borderColor = 'rgba(255,255,255,0.12)';
+        });
+        authLoginBtn.addEventListener('mouseout', () => {
+            authLoginBtn.style.background = 'transparent';
+            authLoginBtn.style.borderColor = 'rgba(255,255,255,0.08)';
+        });
+
+        row.appendChild(authSignupBtn);
+        row.appendChild(authLoginBtn);
+        box.appendChild(title);
+        box.appendChild(authUsername);
+        box.appendChild(authEmail);
+        box.appendChild(authPassword);
+        box.appendChild(row);
+        authModal.appendChild(box);
+        document.body.appendChild(authModal);
+
+        authSignupBtn.addEventListener('click', async () => {
+          await doAuth('/signup');
+        });
+        authLoginBtn.addEventListener('click', async () => {
+          await doAuth('/login');
+        });
+      }
+
+      function showAuth(){
+        if (!authModal) createAuthModal();
+        authModal.style.display = 'flex';
+      }
+
+      function hideAuth(){
+        if (authModal) authModal.style.display = 'none';
+      }
+
+      async function doAuth(path){
+        const username = authUsername.value && authUsername.value.trim();
+        const password = authPassword.value && authPassword.value.trim();
+        const email = authEmail.value && authEmail.value.trim();
+        
+        if (!username || !password) { alert('Username & password required'); return; }
+        if (path === '/signup' && email && !email.includes('@')) { alert('Please enter a valid email address'); return; }
+        
+        try {
+          const payload = { username, password };
+          if (email) payload.email = email;
+          
+          const res = await fetch(path, { 
+            method: 'POST', 
+            headers: {'Content-Type':'application/json'}, 
+            body: JSON.stringify(payload) 
+          });
+          
+          const j = await res.json();
+          if (res.ok) {
+            hideAuth();
+            checkHealth();
+          } else {
+            alert(j.error || 'Authentication failed');
+          }
+        } catch(e) {
+          alert('Authentication request failed');
+        }
+      }
+
+      let currentContext = null;
+      const contextDescriptions = {
+        reuse: 'You are an expert in creative reuse, upcycling, and sustainable practices. Help users find innovative ways to reuse or repurpose items instead of discarding them.',
+        law: 'You are a consumer rights expert. Help users understand their legal rights as consumers, warranty claims, and product safety regulations.',
+        finance: 'You are a financial literacy advisor. Help users understand budgeting, savings, investments, and making informed financial decisions.'
+      };
+
+      function setContext(context) {
+        // Remove active class from all icons
+        document.querySelectorAll('.icon-btn').forEach(btn => btn.classList.remove('active'));
+        
+        if (context === currentContext) {
+          // Deselect if clicking the active context
+          currentContext = null;
+          addBubble('Context cleared. How can I help you?', 'ai');
+        } else {
+          // Set new context
+          currentContext = context;
+          document.querySelector('[data-context="' + context + '"]').classList.add('active');
+          addBubble('Switched to ' + context + ' context. ' + contextDescriptions[context] + '\nHow can I help you?', 'ai');
+        }
+      }
+
+      async function send(){
+        const v = input.value.trim();
+        if(!v) return;
+        addBubble(v,'you');
+        input.value='';
+        try{
+          let message = v;
+          if (currentContext) {
+            message = '[Context: ' + contextDescriptions[currentContext] + '] User query: ' + v;
+          }
+          
+          const res = await fetch('/chat',{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({message})
+          });
+          
+          const json = await res.json();
+          if(res.ok) addBubble(json.reply || json.response || JSON.stringify(json),'ai');
+          else if (res.status === 401) { addBubble('Please sign in first','ai'); showAuth(); }
+          else addBubble('Error: '+(json.error||res.statusText),'ai');
+        }catch(err){addBubble('Error connecting to server','ai')}
+      }
+      // Register service worker for PWA install
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then((reg) => {
+            console.log('Service worker registered', reg);
+          })
+          .catch((err) => console.warn('Service worker failed to register', err));
+      }
+
+      // Camera and weight estimation
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      const startBtn = document.getElementById('startCamera');
+      const captureBtn = document.getElementById('captureImage');
+      const result = document.getElementById('result');
+      const estWeight = document.getElementById('estWeight');
+      const estValue = document.getElementById('estValue');
+
+      // Waste type prices (R/kg)
+      const prices = {
+        'PET': 2.50,
+        'HDPE': 3.00,
+        'aluminum': 8.00,
+        'glass': 0.50,
+        'paper': 1.00
+      };
+
+      let stream = null;
+
+      startBtn.addEventListener('click', async () => {
+        try {
+          if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            startBtn.textContent = 'Start Camera';
+            stream = null;
+            return;
+          }
+
+          stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { 
+              facingMode: 'environment',
+              width: { ideal: 1280 },
+              height: { ideal: 720 }
+            } 
+          });
+          video.srcObject = stream;
+          startBtn.textContent = 'Stop Camera';
+        } catch (err) {
+          console.error('Camera error:', err);
+          alert('Could not access camera. Please ensure camera permissions are granted.');
+        }
+      });
+
+      captureBtn.addEventListener('click', () => {
+        if (!stream) {
+          alert('Please start the camera first');
+          return;
+        }
+
+        // Capture frame
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0);
+
+        // Get image data for analysis
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        
+        // Simulate weight estimation based on object size in frame
+        // In a real app, this would use ML for object detection and size estimation
+        const weight = estimateWeight(imageData);
+        const type = detectWasteType(imageData);
+        const value = calculateValue(weight, type);
+
+        // Show results
+        result.style.display = 'block';
+        estWeight.textContent = weight.toFixed(2);
+        estValue.textContent = value.toFixed(2);
+      });
+
+      function estimateWeight(imageData) {
+        // Simplified estimation - in reality would use ML model
+        // This demo uses basic image analysis
+        let totalPixels = 0;
+        const data = imageData.data;
+        
+        // Count non-background pixels
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          if (r > 30 || g > 30 || b > 30) { // Non-black pixels
+            totalPixels++;
+          }
+        }
+
+        // Convert pixel count to rough weight estimate
+        // This is a very simple approximation
+        const coverage = totalPixels / (imageData.width * imageData.height);
+        return coverage * 5; // Rough estimate, max 5kg
+      }
+
+      function detectWasteType(imageData) {
+        // Simplified type detection - would use ML in production
+        // Returns the most likely waste type based on color analysis
+        const data = imageData.data;
+        let colors = { r: 0, g: 0, b: 0 };
+        
+        for (let i = 0; i < data.length; i += 4) {
+          colors.r += data[i];
+          colors.g += data[i + 1];
+          colors.b += data[i + 2];
+        }
+
+        // Simple color-based classification
+        const total = colors.r + colors.g + colors.b;
+        if (total > 0) {
+          if (colors.b > colors.r && colors.b > colors.g) return 'PET';
+          if (colors.g > colors.r && colors.g > colors.b) return 'HDPE';
+          if (colors.r > colors.g && colors.r > colors.b) return 'aluminum';
+          return 'paper';
+        }
+        return 'paper';
+      }
+
+      function calculateValue(weight, type) {
+        return weight * (prices[type] || prices.paper);
+      }
+    </script>
+    </body>
+</html>

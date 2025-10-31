@@ -4,3 +4,11 @@ build:
 
 # Start the app
 start: node server.js
+
+# Environment variables for the deployed site
+env:
+  - name: PUBLIC_URL
+    value: "https://trash-to-treasure.onrender.com"
+
+# Health check (Render will attempt this endpoint to verify the service)
+health_check_path: /health
